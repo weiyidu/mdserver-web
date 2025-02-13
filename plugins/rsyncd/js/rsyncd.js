@@ -84,6 +84,15 @@ function createSendTask(name = ''){
             period_minute_n = "selected";
         }
 
+        var bwlimit = "1024";
+        if ('rsync' in data){
+            bwlimit = data['rsync']['bwlimit'];
+        }
+
+        var delay = "3";
+        if ('delay' in data){
+            delay = data['delay'];
+        }
 
         var layerID = layer.open({
             type: 1,
@@ -146,9 +155,9 @@ function createSendTask(name = ''){
                 <div class='line'>\
                     <span class='tname'>限速</span>\
                     <div class='info-r c4'>\
-                        <input class='bt-input-text' type='number' name='bwlimit' min='0'  value='1024' style='width:100px' /> KB\
+                        <input class='bt-input-text' type='number' name='bwlimit' min='0'  value='"+bwlimit+"' style='width:100px' /> KB\
                         <span data-toggle='tooltip' data-placement='top' title='【限速】限制数据同步任务的速度，防止因同步数据导致带宽跑高' class='bt-ico-ask' style='cursor: pointer;'>?</span>\
-                        <span style='margin-left: 29px;margin-right: 10px;'>延迟</span><input class='bt-input-text' min='0' type='number' name='delay'  value='3' style='width:100px' /> 秒\
+                        <span style='margin-left: 29px;margin-right: 10px;'>延迟</span><input class='bt-input-text' min='0' type='number' name='delay'  value='"+delay+"' style='width:100px' /> 秒\
                         <span data-toggle='tooltip' data-placement='top' title='【延迟】在延迟时间周期内仅记录不同步，到达周期后一次性同步数据，以节省开销' class='bt-ico-ask' style='cursor: pointer;'>?</span>\
                     </div>\
                 </div>\
@@ -667,9 +676,13 @@ function addReceive(name = ""){
                 var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
                 rsPost('add_rec', args, function(data){
                     var rdata = $.parseJSON(data.data);
-                    layer.close(loadOpen);
-                    layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
-                    setTimeout(function(){rsyncdReceive();},2000);
+                    if (rdata['status']){
+                        layer.close(loadOpen);
+                        layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
+                        setTimeout(function(){rsyncdReceive();},2000); 
+                    } else {
+                        layer.msg(rdata.msg,{icon:rdata.status?1:2,time:10000,shade: [0.3, '#000']});
+                    }
                 });
             }
         });

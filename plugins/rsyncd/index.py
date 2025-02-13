@@ -281,21 +281,33 @@ def rsyncOp(method):
     return 'fail'
 
 
-def start():
-    return rsyncOp('start')
+def lsyncdOp(method):
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl ' + method + ' lsyncd')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+    return 'fail'
 
+def start():
+    status = rsyncOp('start')
+    lsyncdOp('start')
+    return status
 
 def stop():
-    return rsyncOp('stop')
-
+    status =  rsyncOp('stop')
+    lsyncdOp('stop')
+    return status
 
 def restart():
-    return rsyncOp('restart')
-
+    status = rsyncOp('restart')
+    lsyncdOp('restart')
+    return status
 
 def reload():
-    return rsyncOp('reload')
-
+    status = rsyncOp('reload')
+    lsyncdOp('reload')
+    return status
 
 def initdStatus():
     if mw.isAppleSystem():
@@ -387,9 +399,16 @@ def addRec():
     args_ps = args['ps']
 
     if not mw.isAppleSystem():
-        os.system("mkdir -p " + args_path + " &")
-        os.system("chown -R  www:www " + args_path + " &")
-        os.system("chmod -R 755 " + args_path + " &")
+        if os.path.exists(args_path):
+            import utils.file as utils_file
+            info = utils_file.getAccess(args_path)
+            file_chown = info['chown']
+            if file_chown != 'www':
+                return mw.returnJson(False, '建议手动执行命令: chown -R www:www '+ args_path)
+        else:
+            os.system("mkdir -p " + args_path + " &")
+            os.system("chown -R  www:www " + args_path + " &")
+            os.system("chmod -R 755 " + args_path + " &")
 
     delRecBy(args_name)
 
@@ -715,7 +734,7 @@ def lsyncdAdd():
     import base64
 
     args = getArgs()
-    data = checkArgs(args, ['ip', 'conn_type', 'path', 'delay', 'period'])
+    data = checkArgs(args, ['ip', 'conn_type', 'path', 'delay', 'period', 'bwlimit'])
     if not data[0]:
         return data[1]
 
@@ -723,9 +742,16 @@ def lsyncdAdd():
     path = args['path']
 
     if not mw.isAppleSystem():
-        os.system("mkdir -p " + path + " &")
-        os.system("chown -R  www:www " + path + " &")
-        os.system("chmod -R 755 " + path + " &")
+        if os.path.exists(path):
+            import utils.file as utils_file
+            info = utils_file.getAccess(path)
+            file_chown = info['chown']
+            if file_chown != 'www':
+                return mw.returnJson(False, '建议手动执行命令: chown -R www:www '+ args_path)
+        else:
+            os.system("mkdir -p " + path + " &")
+            os.system("chown -R  www:www " + path + " &")
+            os.system("chmod -R 755 " + path + " &")
 
     conn_type = args['conn_type']
 

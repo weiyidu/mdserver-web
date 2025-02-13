@@ -23,7 +23,8 @@ apt install ntpdate -y
 apt update -y
 apt autoremove -y
 
-apt install -y wget curl lsof unzip
+apt install -y wget curl unzip
+apt install -y lsof
 apt install -y rar unrar
 apt install -y xz-utils
 apt install -y python3-pip
@@ -47,6 +48,7 @@ apt install -y numactl
 apt install -y libaio1t64
 
 apt install -y dnsutils
+apt install -y numactl
 
 # https://www.php.net/manual/zh/mysql-xdevapi.installation.php
 apt install -y libprotobuf-dev

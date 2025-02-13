@@ -34,7 +34,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 
 	if [ "$LOCAL_ADDR" == "cn" ];then
 		if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-			wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://mirrors.sohu.com/php/php-${version}.tar.xz
+			wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://mirrors.nju.edu.cn/php/php-${version}.tar.xz
 		fi
 	fi
 	# ----------------------------------------------------------------------- #
@@ -113,6 +113,8 @@ if [ "$sysName" == "Darwin" ];then
 	export OPENSSL_CFLAGS="-I${LIB_DEPEND_DIR}/include"
 	export OPENSSL_LIBS="-L/${LIB_DEPEND_DIR}/lib -lssl -lcrypto -lz"
 else
+	cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
+	export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$serverPath/lib/openssl10/lib/pkgconfig
 	OPTIONS="$OPTIONS --with-openssl"
 fi
 
